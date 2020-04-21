@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Section;
+use App\Article;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Section;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
-class SectionController extends Controller
+class ArticleController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,8 +17,7 @@ class SectionController extends Controller
      */
     public function index()
     {
-        $sections = Section::where('user_id', 1)->get();
-        dd($sections);
+        dd(Article::all());
     }
 
     /**
@@ -27,40 +27,54 @@ class SectionController extends Controller
      */
     public function create()
     {
-        return view('sections.create');
+        $sections = Section::where('user_id', Auth::id())->get();
+        return view('articles.create', ['sections' => $sections]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
         Validator::make($request->all(), [
+            'section_id' => 'required|integer',
             'title' => 'required',
+            'description' => 'required',
             'image' => 'nullable|mimes:jpeg,png,jpg,gif|max:2048'
         ])->validate();
 
-        $imagePath = $request->file('image')->store('sections', 'public');
-        Section::create([
+        $imagePath = $request->file('image')->store('articles', 'public');
+        Article::create([
             'user_id' => Auth::id(),
+            'section_id' => $request->section_id,
             'title' => $request->title,
             'description' => $request->description,
             'image_path' => $imagePath
         ]);
+        return redirect('articles');
+    }
 
-        return redirect('sections');
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Article  $article
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Article $article)
+    {
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Section  $section
+     * @param  \App\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function edit(Section $section)
+    public function edit(Article $article)
     {
         //
     }
@@ -69,10 +83,10 @@ class SectionController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Section  $section
+     * @param  \App\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Section $section)
+    public function update(Request $request, Article $article)
     {
         //
     }
@@ -80,10 +94,10 @@ class SectionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Section  $section
+     * @param  \App\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Section $section)
+    public function destroy(Article $article)
     {
         //
     }

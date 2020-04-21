@@ -2,19 +2,13 @@
 
 @section('content')
 <div class="container">
-    <nav aria-label="breadcrumb" class="breadcrumb">
-        <div class="col-10">Blog by Nikita</div>
-        <div class="breadcrumb-item"><a href="#">Home</a></div>
-        <div class="breadcrumb-item"><a href="#">Library</a></div>
-        <div class="breadcrumb-item active" aria-current="page">Data</div>
-    </nav>
-    <div class="card bg-dark text-white">
-        <img class="card-img" src="https://i.imgur.com/an6MU8X.jpg" alt="Card image">
-        <div class="card-img-overlay">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-            <p class="card-text">Last updated 3 mins ago</p>
-        </div>
+    <div class="jumbotron text-white shadow text-center" style="background-image: url(https://images.unsplash.com/photo-1552152974-19b9caf99137?fit=crop&w=1350&q=80);">
+        <h2 class="mb-4">
+            Jumbotron with background image
+        </h2>
+        <p class="mb-4">
+            Hey, check this out.
+        </p>
     </div>
     <div class="row mt-3">
         <div class="col-8">

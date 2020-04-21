@@ -21,3 +21,6 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::resource('sections', 'SectionController')->except(['show']);
+Route::resource('articles', 'ArticleController');
+Route::get('/users/{user}/sections', 'BlogController@showFullArticleList')->name('users.sections.articles.all');
+Route::resource('users.sections.articles', 'BlogController')->only(['index', 'show']);
