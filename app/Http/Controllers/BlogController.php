@@ -2,59 +2,62 @@
 
 namespace App\Http\Controllers;
 
-use App\Section;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 use App\User;
+use App\Article;
 
 class BlogController extends Controller
 {
     private $user;
-    private $section;
-    private $userSections;
 
+    /**
+     * Get user from request
+     *
+     * BlogController constructor.
+     * @param Request $request
+     */
     public function __construct(Request $request)
     {
         $this->user = User::find($request->user);
-        $this->section = Section::find($request->section);
-        $this->userSections = $this->user->sections;
+        View::share('sections', $this->user->sections);
+        View::share('user', $this->user);
+        View::share('latestPosts', Article::latest()->limit(5)->get()->load('user'));
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @param $user
      * @param $section
-     * @return void
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function index($user, $section)
     {
-        $articles = $this->section->articles;
-        /*$articles = $this->user->with(['articles' => function($query) use($section) {
-            $query->where('section_id', $section);
-        }])->get()->pluck('articles');*/
-        //dd(compact('articles'));
-        return view('sections.list', compact('articles'));
+        $currentSection = $this->user->sections->find($section);
+        if(!$currentSection) abort(404);
+        $articles = $currentSection->articles;
+        return view('layouts.list', compact('currentSection', 'articles'));
     }
 
 
     /**
      * Display the specified resource.
      *
-     * @param $user
      * @param $section
      * @param $article
      * @return void
      */
     public function show($user, $section, $article)
     {
-        $article = $this->section->load(['articles' => function($query) use($article) {
-            $query->where('id', $article);
-        }]);
+        $article = $this->user->sections->find($section)->articles->find($article);
         dd($article);
     }
 
 
-    public function showFullArticleList($user)
+    /**
+     * Display all articles
+     */
+    public function showFullArticleList()
     {
         $articles = $this->user->articles;
         dd($articles);
