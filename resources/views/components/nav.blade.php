@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="#">{{ $sections ?? '' ? "Blog by {$user->name}" : "Blogs" }}</a>
+        <a class="navbar-brand" href="{{ route('welcome') }}">{{ $sections ?? '' ? "Blog by {$user->name}" : "Blogs" }}</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -10,7 +10,7 @@
             <ul class="navbar-nav mr-auto">
                 @foreach($sections as $section)
                     <li class="nav-item">
-                        <a class="nav-link" href="/users/{{ $user->id }}/sections/{{ $section->id }}/articles">{{ $section->title }}</a>
+                        <a class="nav-link" href="{{route('users.sections.articles.index', ['user' => Auth::id(), 'section' => $section->id])}}">{{ $section->title }}</a>
                     </li>
                 @endforeach
             </ul>
@@ -33,6 +33,15 @@
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('home') }}">
+                                {{ __('Home') }}
+                            </a>
+                            <a class="dropdown-item" href="{{ route('sections.create') }}">
+                                {{ __('Create section') }}
+                            </a>
+                            <a class="dropdown-item" href="{{ route('articles.create') }}">
+                                {{ __('Create article') }}
+                            </a>
                             <a class="dropdown-item" href="{{ route('logout') }}"
                                onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">

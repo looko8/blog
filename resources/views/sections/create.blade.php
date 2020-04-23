@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@section('nav')
+    <x-nav></x-nav>
+@endsection
+
 @section('content')
     <div class="container">
         <h1>Create section</h1>

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\User;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -23,6 +25,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home', ['type' => 'primary', 'message' => 'not ok']);
+        $user = User::find(Auth::id());
+        $sections = $user->sections;
+        $articles = $user->articles;
+        return view('home', compact('sections', 'articles'));
     }
 }

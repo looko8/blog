@@ -45,21 +45,24 @@ class BlogController extends Controller
      *
      * @param $section
      * @param $article
-     * @return void
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function show($user, $section, $article)
     {
         $article = $this->user->sections->find($section)->articles->find($article);
-        dd($article);
+        $article->load('section');
+        return view('layouts.item', compact('article'));
     }
 
 
     /**
      * Display all articles
+     *
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function showFullArticleList()
     {
         $articles = $this->user->articles;
-        dd($articles);
+        return view('layouts.list', compact('articles'));
     }
 }
