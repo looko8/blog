@@ -8,11 +8,27 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             @if($sections ?? '')
             <ul class="navbar-nav mr-auto">
-                @foreach($sections as $section)
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{route('users.sections.articles.index', ['user' => Auth::id(), 'section' => $section->id])}}">{{ $section->title }}</a>
-                    </li>
-                @endforeach
+                @if(count($sections) > 5)
+                    @for ($i = 0; $i < 5; $i++)
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{route('users.sections.articles.index', ['user' => Auth::id(), 'section' => $sections[$i]->id])}}">{{ $sections[$i]->title }}</a>
+                        </li>
+                    @endfor
+                    <div class="dropdown mt-1">
+                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            @for($i = 5; $i < count($sections); $i++)
+                                <a class="dropdown-item" href="{{route('users.sections.articles.index', ['user' => Auth::id(), 'section' => $sections[$i]->id])}}">{{ $sections[$i]->title }}</a>
+                            @endfor
+                        </div>
+                    </div>
+                @else
+                    @foreach($sections as $section)
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{route('users.sections.articles.index', ['user' => Auth::id(), 'section' => $section->id])}}">{{ $section->title }}</a>
+                        </li>
+                    @endforeach
+                @endif
             </ul>
             @endif
             <ul class="navbar-nav ml-auto">

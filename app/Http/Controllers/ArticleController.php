@@ -10,6 +10,17 @@ use Illuminate\Support\Facades\Validator;
 
 class ArticleController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if($request->article->user_id !== Auth::id()) {
+                abort(404);
+            }
+            return $next($request);
+        })->only('edit', 'update', 'destroy');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -76,7 +87,7 @@ class ArticleController extends Controller
      */
     public function edit(Article $article)
     {
-        //
+        dd($article);
     }
 
     /**

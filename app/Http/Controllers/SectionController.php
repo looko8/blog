@@ -4,11 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Section;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
 class SectionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if($request->section->user_id !== Auth::id()) {
+                abort(404);
+            }
+            return $next($request);
+        })->only('edit', 'update', 'destroy');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -38,12 +49,9 @@ class SectionController extends Controller
      */
     public function store(Request $request)
     {
-        Validator::make($request->all(), [
-            'title' => 'required',
-            'image' => 'nullable|mimes:jpeg,png,jpg,gif|max:2048'
-        ])->validate();
+        $this->validator($request);
 
-        $imagePath = $request->file('image')->store('sections', 'public');
+        $imagePath = $request->hasFile('image') ? $request->file('image')->store('sections', 'public') : NULL;
         Section::create([
             'user_id' => Auth::id(),
             'title' => $request->title,
@@ -58,11 +66,11 @@ class SectionController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Section  $section
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function edit(Section $section)
     {
-        //
+        return view('sections.edit', compact('section'));
     }
 
     /**
@@ -70,11 +78,23 @@ class SectionController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Section  $section
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function update(Request $request, Section $section)
     {
-        //
+        $this->validator($request);
+
+        $section->title = $request->title;
+        $section->description = $request->description;
+
+        if($request->hasFile('image')) {
+            Storage::disk('public')->delete($section->image_path);
+            $imagePath = $request->file('image')->store('sections', 'public');
+            $section->image_path = $imagePath;
+        }
+        $section->save();
+
+        return redirect('home');
     }
 
     /**
@@ -86,5 +106,14 @@ class SectionController extends Controller
     public function destroy(Section $section)
     {
         //
+    }
+
+    private function validator(Request $request)
+    {
+        return Validator::make($request->all(), [
+            'title' => 'required',
+            'description' => 'required',
+            'image' => 'nullable|mimes:jpeg,png,jpg,gif|max:2048'
+        ])->validate();
     }
 }
