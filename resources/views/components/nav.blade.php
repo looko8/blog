@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="{{ route('welcome') }}">{{ $sections ?? '' ? "Blog by {$user->name}" : "Blogs" }}</a>
+        <a class="navbar-brand" href="{{ $sections ?? '' ? route('users.sections.articles.all', ['user' => $user->id]) : route('welcome') }}">{{ $sections ?? '' ? "Blog by {$user->name}" : "Blogs" }}</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -11,21 +11,21 @@
                 @if(count($sections) > 5)
                     @for ($i = 0; $i < 5; $i++)
                         <li class="nav-item">
-                            <a class="nav-link" href="{{route('users.sections.articles.index', ['user' => Auth::id(), 'section' => $sections[$i]->id])}}">{{ $sections[$i]->title }}</a>
+                            <a class="nav-link" href="{{route('users.sections.articles.index', ['user' => $sections[$i]->user_id, 'section' => $sections[$i]->id])}}">{{ $sections[$i]->title }}</a>
                         </li>
                     @endfor
                     <div class="dropdown mt-1">
                         <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             @for($i = 5; $i < count($sections); $i++)
-                                <a class="dropdown-item" href="{{route('users.sections.articles.index', ['user' => Auth::id(), 'section' => $sections[$i]->id])}}">{{ $sections[$i]->title }}</a>
+                                <a class="dropdown-item" href="{{route('users.sections.articles.index', ['user' => $sections[$i]->user_id, 'section' => $sections[$i]->id])}}">{{ $sections[$i]->title }}</a>
                             @endfor
                         </div>
                     </div>
                 @else
                     @foreach($sections as $section)
                         <li class="nav-item">
-                            <a class="nav-link" href="{{route('users.sections.articles.index', ['user' => Auth::id(), 'section' => $section->id])}}">{{ $section->title }}</a>
+                            <a class="nav-link" href="{{route('users.sections.articles.index', ['user' => $section->user_id, 'section' => $section->id])}}">{{ $section->title }}</a>
                         </li>
                     @endforeach
                 @endif
@@ -49,6 +49,9 @@
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('users.sections.articles.all', ['user' => Auth::id()]) }}">
+                                {{ __('My Blog') }}
+                            </a>
                             <a class="dropdown-item" href="{{ route('home') }}">
                                 {{ __('Home') }}
                             </a>

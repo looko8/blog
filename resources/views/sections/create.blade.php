@@ -6,6 +6,11 @@
 
 @section('content')
     <div class="container">
+        @if(session('userHasNoSections'))
+            <div class="alert alert-danger" role="alert">
+                {{session('userHasNoSections')}}
+            </div>
+        @endif
         <h1>Create section</h1>
         <form action="{{route('sections.store')}}" method="POST" enctype="multipart/form-data">
             @csrf

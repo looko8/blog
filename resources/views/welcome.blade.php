@@ -85,7 +85,7 @@
                 </div>
 
                 <div class="links">
-                    <a href="#">Users</a>
+                    <a href="{{ route('users') }}">Users</a>
                 </div>
             </div>
         </div>

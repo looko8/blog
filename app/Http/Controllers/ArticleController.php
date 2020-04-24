@@ -6,6 +6,7 @@ use App\Article;
 use Illuminate\Http\Request;
 use App\Section;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ArticleController extends Controller
@@ -22,40 +23,25 @@ class ArticleController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        dd(Article::all());
-    }
-
-    /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function create()
     {
-        $sections = Section::where('user_id', Auth::id())->get();
-        return view('articles.create', ['sections' => $sections]);
+        $sections = Auth::user()->sections;
+        return count($sections) > 0 ? view('articles.create', ['sections' => $sections]) : redirect()->route('sections.create')->with('userHasNoSections', 'You have no sections to create an article. Please create a section.');
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function store(Request $request)
     {
-        Validator::make($request->all(), [
-            'section_id' => 'required|integer',
-            'title' => 'required',
-            'description' => 'required',
-            'image' => 'nullable|mimes:jpeg,png,jpg,gif|max:2048'
-        ])->validate();
+        $this->validator($request);
 
         $imagePath = $request->file('image')->store('articles', 'public');
         Article::create([
@@ -65,29 +51,19 @@ class ArticleController extends Controller
             'description' => $request->description,
             'image_path' => $imagePath
         ]);
-        return redirect('articles');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Article  $article
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Article $article)
-    {
-        //
+        return redirect()->route('home')->with('message', 'Article created successful');
     }
 
     /**
      * Show the form for editing the specified resource.
      *
      * @param  \App\Article  $article
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function edit(Article $article)
     {
-        dd($article);
+        $sections = Auth::user()->sections;
+        return view('articles.edit', compact('article', 'sections'));
     }
 
     /**
@@ -95,11 +71,25 @@ class ArticleController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Article  $article
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function update(Request $request, Article $article)
     {
-        //
+        $this->validator($request);
+
+        $article->section_id = $request->section_id;
+        $article->title = $request->title;
+        $article->description = $request->description;
+
+        if($request->hasFile('image')) {
+            Storage::disk('public')->delete($article->image_path);
+            $imagePath = $request->file('image')->store('articles', 'public');
+            $article->image_path = $imagePath;
+        }
+        $article->save();
+
+        return redirect('home');
+
     }
 
     /**
@@ -110,6 +100,17 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
-        //
+        $article->delete();
+        return redirect('home')->with("message", "Article    \"{$article->title}\" deleted successful");
+    }
+
+    private function validator(Request $request)
+    {
+        return Validator::make($request->all(), [
+            'section_id' => 'required|integer',
+            'title' => 'required',
+            'description' => 'required',
+            'image' => 'nullable|mimes:jpeg,png,jpg,gif|max:2048'
+        ])->validate();
     }
 }

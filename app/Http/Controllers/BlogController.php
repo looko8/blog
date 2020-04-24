@@ -19,10 +19,12 @@ class BlogController extends Controller
      */
     public function __construct(Request $request)
     {
-        $this->user = User::find($request->user);
-        View::share('sections', $this->user->sections);
-        View::share('user', $this->user);
-        View::share('latestPosts', Article::latest()->limit(5)->get()->load('user'));
+        if ($request->user) {
+            $this->user = User::find($request->user);
+            View::share('sections', $this->user->sections);
+            View::share('user', $this->user);
+            View::share('latestPosts', Article::latest()->limit(5)->get()->load('user'));
+        }
     }
 
     /**
@@ -64,5 +66,14 @@ class BlogController extends Controller
     {
         $articles = $this->user->articles;
         return view('layouts.list', compact('articles'));
+    }
+
+    /**
+     * Show all users who have at least one article
+     */
+    public function showUserList()
+    {
+        $users = User::all()->loadCount('articles')->where('articles_count', '>', 0);
+        return view('user.list', compact('users'));
     }
 }

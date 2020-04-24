@@ -21,17 +21,6 @@ class SectionController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        $sections = Section::where('user_id', 1)->get();
-        dd($sections);
-    }
-
-    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
@@ -59,7 +48,7 @@ class SectionController extends Controller
             'image_path' => $imagePath
         ]);
 
-        return redirect('sections');
+        return redirect()->route('articles.create')->with('canCreateArticle', 'Now you can create an article!');
     }
 
     /**
@@ -105,7 +94,9 @@ class SectionController extends Controller
      */
     public function destroy(Section $section)
     {
-        //
+        $section->articles()->delete();
+        $section->delete();
+        return redirect('home')->with("message", "Section \"{$section->title}\" deleted successful");
     }
 
     private function validator(Request $request)
