@@ -28,7 +28,7 @@
                             <h6 class="card-subtitle mb-2 text-muted col-md-auto">{{ $article->created_at }}</h6>
                         </div>
                         <hr/>
-                        <p class="card-text">{{ $article->description }}</p>
+                        <p class="card-text">{{ Str::limit($article->description, 40) }}</p>
                     </div>
                 </div>
             </div>
