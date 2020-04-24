@@ -20,8 +20,11 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
-Route::resource('sections', 'SectionController')->except(['index', 'show']);
-Route::resource('articles', 'ArticleController')->except(['index', 'show']);
+
+Route::middleware('auth')->group(function () {
+    Route::resource('sections', 'SectionController')->except(['index', 'show']);
+    Route::resource('articles', 'ArticleController')->except(['index', 'show']);
+});
 Route::get('/users', 'BlogController@showUserList')->name('users');
 Route::get('/users/{user}/sections', 'BlogController@showFullArticleList')->name('users.sections.articles.all');
 Route::resource('users.sections.articles', 'BlogController')->only(['index', 'show']);
